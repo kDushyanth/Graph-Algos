@@ -44,13 +44,13 @@ void post(node *root)
     }
 
 }
-node *searc(node *root,int key)
+node *search(node *root,int key)
 {
     if(root==NULL || root->data==key)return root;
-    if(root->data < key)return searc(root->r,key);
-    if(root->data > key)return searc(root->l,key);
+    if(root->data < key)return search(root->r,key);
+    if(root->data > key)return search(root->l,key);
 }
-node *ist(node *root,int key)
+node *insert(node *root,int key)
 {
     if(root==NULL)
     {
@@ -59,8 +59,8 @@ node *ist(node *root,int key)
         nn->l=nn->r=NULL;
         return nn;
     }
-    if(root->data <key)root->r=ist(root->r,key);
-    if(root->data >key)root->l=ist(root->l,key);
+    if(root->data <key)root->r=insert(root->r,key);
+    if(root->data >key)root->l=insert(root->l,key);
     return root;
 }
 node *del(node *root ,int key)
@@ -90,11 +90,11 @@ node *del(node *root ,int key)
     }
     return root;
 }
-int hei(node *root)
+int height(node *root)
 {
     if(root==NULL)return -1;
-    int x=hei(root->l);
-    int y=hei(root->r);
+    int x=height(root->l);
+    int y=height(root->r);
     return x>y? x+1:y+1;
 }
 int main()
@@ -109,10 +109,10 @@ int main()
     //post(root);
     int key;
     cin>>key;
-   root=ist(root,key);
-post(root);
-root=del(root,key);
-post(root);
-cout<<endl;
-cout<<hei(root);
+   root=insert(root,key);
+   post(root);cout<<endl;
+   root=del(root,key);
+   post(root);
+   cout<<endl;
+   cout<<height(root);
 }
