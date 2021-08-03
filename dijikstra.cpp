@@ -23,7 +23,7 @@ void print(node *adj[],int n)
         }cout<<endl;
     }
 }
-void swa(no k[],int idx[],int a,int b)
+void swap(no k[],int idx[],int a,int b)
 {
     int t=idx[k[a].v-1];
     idx[k[a].v-1]=idx[k[b].v-1];
@@ -44,14 +44,14 @@ void movedown(no k[],int idx[],int n1,int i)
     if(r<n1&& k[mi].key >k[r].key)mi=r;
     if(mi!=i)
     {
-        swa(k,idx,mi,i);
+        swap(k,idx,mi,i);
         movedown(k,idx,n1,mi);
     }
 }
 no ext(no k[],int idx[],int *n1)
 {
     no t=k[0];int in=k[0].v;
-    swa(k,idx,0,*n1-1);
+    swap(k,idx,0,*n1-1);
     *n1=*n1-1;
     movedown(k,idx,*n1,0);
     idx[in-1]={-1};
@@ -62,7 +62,7 @@ no ext(no k[],int idx[],int *n1)
      int p=(i-1)/2;
      if(p>=0 && k[p].key > k[i].key)
      {
-         swa(k,idx,i,p);
+         swap(k,idx,i,p);
          moveup(k,idx,n1,p);
      }
  }
@@ -97,8 +97,8 @@ int main()
    int source;cin>>source;
     k[idx[source-1]].key=0;
     int parent[n1]={-1};
-    int coun=n;
-    while(coun--)
+    int count=n;
+    while(count--)
     {
       no t=ext(k,idx,&n1);
       node *temp=adj[t.v-1];
