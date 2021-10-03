@@ -1,103 +1,83 @@
-#include<iostream>
-using namespace std;
-#include<cstdlib>
-typedef struct node{
-int data;
-int w;
-struct node *next;
-}node;
-void print(node *adj[],int n)
-{
-    for(int i=0;i<n;i++)
-    {
-        cout<<i+1<<"->";
-        node *temp=adj[i];
-        while(temp!=NULL)
-        {
-            cout<<temp->data<<" "<<temp->w<<"--";
-            temp=temp->next;
-        }cout<<endl;
+class node{
+  public:
+    int data;
+    int w;
+    node *next;
+    node(int data,int w):data(data),w(w){
+        next = NULL;
     }
-}
-int found=1,bcap=0;
-void dfs(node *adj[],int n,int parent[],int visited[],int source,int sink)
+};
+//find max flow in the undirected graph from node 0 to node N-1;
+class Solution
 {
-    if(source==sink){found=1;}
-    visited[source-1]=1;
-    node *temp=adj[source-1];cout<<source<<" ";
-    while(temp!=NULL && found==0 )
-    {
-        if(visited[temp->data-1]==0 && temp->w!=0)
-        {
-
-            parent[temp->data-1]=source;
-            if(temp->w < bcap)bcap=temp->w;
-            dfs(adj,n,parent,visited,temp->data,sink);
-            if(found==1)
-            {
-                node *temp1=adj[temp->data-1];
-                while(temp1->data!=source)temp1=temp1->next;
-                temp1->w +=bcap;
-                temp->w -=bcap;
+public:
+    void dfs(node *adj[],int src,int dest,vector<bool> &v,int &bcap,bool &found){
+        //dest reached => path found
+        if(src==dest){
+            found = true;
+            return;
+        }
+        v[src] = true;
+        for(node *x = adj[src];x!=NULL;x=x->next){
+            if(v[x->data]==false && found==false && x->w){
+                //bottle neck capacity
+                bcap  = min(x->w,bcap);
+                dfs(adj,x->data,dest,v,bcap,found);
+                //if path found
+                if(found){
+                    // decrease by bcap
+                        x->w -=bcap;
+                        for(node *y = adj[x->data];y!=NULL;y = y->next){
+                            if(y->data==src){
+                                //increase by bcap on reverse edge
+                                y->w+=bcap;
+                                break;
+                            }
+                        }
+                        return;
+                }
             }
         }
-        temp=temp->next;
     }
-}
-int main()
-{
-  int n,e;
-  cout<<"enter n and e"<<endl;
-  cin>>n>>e;
-  node *adj[n]={NULL};
-  for(int i=0;i<e;i++)
-  {
-      int a,b,c;
-      cin>>a>>b>>c;
-      node *nn=(node *)malloc(sizeof(node));
-      nn->next=NULL;
-      nn->data=b;
-      nn->w=c;
-      node *temp=adj[a-1];
-      nn->next=adj[a-1];
-      adj[a-1]=nn;
-    }
-  for(int i=0;i<n;i++)
-  {
-      node *temp=adj[i];
-      while(temp!=NULL)
-      {
-          bool isthere=false;
-        node *temp1=adj[temp->data -1];
-        while(temp1!=NULL && temp1->data!=i+1)temp1=temp1->next;
-        if(temp1!=NULL && temp1->data==i+1)isthere=true;
-        if(!isthere)
-        {
-            node *nn=(node *)malloc(sizeof(node));
-            nn->next=NULL;
-            nn->data=i+1;nn->w=0;
-            nn->next=adj[temp->data-1];
-            adj[temp->data-1]=nn;
+    void printer(node *adj[],int v){
+        for(int i=0;i<v;i++){
+            cout<<i<<"->";
+            for(node *x = adj[i];x!=NULL;x=x->next){
+                cout<<x->data<<".."<<x->w<<"-";
+            }cout<<endl;
         }
-          temp=temp->next;
-      }
-  }
-  //print(adj,n);
-  int visited[n]={0};
-  int parent[n]={0};
-  int source,sink;
-  cout<<endl<<"enter source and sink vertices"<<endl;
-  cin>>source>>sink;int flow=0;
-
-while(bcap!=INT_MAX && found==1)
-{
-
-    for(int j=0;j<n;j++){visited[j]=0;parent[j]=0;}
-  bcap=INT_MAX;found=0;
-  dfs(adj,n,parent,visited,source,sink);
-  if(found==1){flow=flow + bcap;}
-
-}//print(adj,n);
-cout<<endl<<"fval :"<<flow<<endl;
-
-}
+    }
+    int solve(int N,int M,vector<vector<int>> Edges)
+    {
+        // code here
+        node *adj[N]={0};
+        for(int i=0;i<M;i++){
+           int u = Edges[i][0]-1,v = Edges[i][1]-1, w = Edges[i][2];
+           node *nn;
+           //edge: u->v (w) => v->u (w)
+           nn = new node(v,w);
+           nn->next = adj[u];
+           adj[u] = nn;
+           nn = new node(u,w);
+           nn->next = adj[v];
+           adj[v] = nn;
+        }
+        
+        int bcap=0;
+        int flow=0;
+        bool found = true;
+        int counter=0;
+        //continue until path is found
+        while(found){
+            //initial bcap is infinity
+            bcap = INT_MAX; found = false;
+            vector<bool> v(N,false);
+            v[0] = true;
+            //find the path
+            dfs(adj,0,N-1,v,bcap,found);
+            //if path found, increase the flow by bcap
+            if(found)flow+=bcap;
+        }
+        return flow;
+    }
+};
