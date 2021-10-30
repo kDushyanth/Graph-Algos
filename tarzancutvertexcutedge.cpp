@@ -7,27 +7,28 @@ int data;
 struct node *next;
 }node;
 int tim=0;int coun=0;
-void dfs(node *adj[],int n,int sou,int p[],int d[],int v[],int f[])
+void dfs(node *adj[],int n,int sou/*source*/,int p[],int d[],int v[],int f[])
 {
     tim++;
-    d[sou-1]=tim;f[sou-1]=tim;
+    d[sou-1]=tim;
+    f[sou-1]=tim;
     v[sou-1]=1;
     node *temp=adj[sou-1];
     temp=adj[sou-1];
     while(temp!=NULL)
-    {if(v[temp->data-1]==1 && p[temp->data-1]!=sou && p[sou-1]!=temp->data && d[temp->data-1]<d[sou-1])
-        {
-            f[sou-1]=(f[sou-1] < d[temp->data-1])? f[sou-1]:d[temp->data-1];
+    {   
+        if(v[temp->data-1]==1 && /*p[temp->data-1]!=sou &&*/ p[sou-1]!=temp->data && d[temp->data-1]<d[sou-1])
+        {//visited node
+            f[sou-1]=min(f[sou-1],d[temp->data-1]);
         }
         if(v[temp->data-1]==0)
-        {
+        {//unvisited node
             p[temp->data-1]=sou;
             if(sou==1)coun++;
             dfs(adj,n,temp->data,p,d,v,f);
-            f[sou-1]=(f[sou-1]<f[temp->data-1])?f[sou-1]:f[temp->data-1];
+            f[sou-1]=min(f[sou-1],f[temp->data-1]);
             if(d[sou-1] <= f[temp->data-1] && sou!=1)cout<<sou<<"-cut vertex"<<endl;
             if(d[sou-1] <  f[temp->data-1] )cout<<sou<< " "<<temp->data<<"-cut edge"<<endl;
-
         }
         temp=temp->next;
     }
@@ -54,19 +55,19 @@ int main()
     p[n],d[n],v[n],f[n],visited[n];
     for(int i=0;i<n;i++)
     {
-        p[i]=-1;
-        d[i]=-1;
-        v[i]=0;
-        f[i]=-1;
+        p[i]=-1;//parent
+        d[i]=-1;//disc time
+        v[i]=0;//visit
+        f[i]=-1;//finish time
         visited[i]=0;
     }
     for(int i=0;i<n;i++)
     {
         if(v[i]==0)dfs(adj,n,i+1,p,d,v,f);
     }
-for(int i=0;i<n;i++)
-{
-    cout<<i+1<<" "<<f[i]<<endl;
-}
-if(coun>1)cout<<"-1 cut vertex"<<endl;
+    for(int i=0;i<n;i++)
+    {
+        cout<<i+1<<" "<<f[i]<<endl;
+    }
+    if(coun>1)cout<<"-1 cut vertex"<<endl;
 }
